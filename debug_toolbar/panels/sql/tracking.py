@@ -100,12 +100,12 @@ class NormalCursorWrapper(object):
         except UnicodeDecodeError:
             return '(encoded string)'
 
+    def is_select(statement):
+        prefix = b'select' if isinstance(statement, bytes) else 'select'
+        return statement.lower().strip().startswith(prefix)
+        
     def _record(self, method, sql, params):
         start_time = time()
-        try:
-            sql = sql.decode()
-        except AttributeError:
-            pass
         try:
             return method(sql, params)
         finally:
@@ -139,7 +139,7 @@ class NormalCursorWrapper(object):
                 'start_time': start_time,
                 'stop_time': stop_time,
                 'is_slow': duration > dt_settings.get_config()['SQL_WARNING_THRESHOLD'],
-                'is_select': sql.lower().strip().startswith('select'),
+                'is_select': is_select(sql),
                 'template_info': template_info,
             }
 
