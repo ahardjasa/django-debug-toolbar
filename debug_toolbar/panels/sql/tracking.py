@@ -103,6 +103,10 @@ class NormalCursorWrapper(object):
     def _record(self, method, sql, params):
         start_time = time()
         try:
+            sql = sql.decode()
+        except AttributeError:
+            pass
+        try:
             return method(sql, params)
         finally:
             stop_time = time()
